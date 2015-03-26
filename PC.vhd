@@ -1,3 +1,5 @@
+-- Test comment
+
 library IEEE;
 use IEEE.std_logic_1164.all;
 use ieee.numeric_std.all;
