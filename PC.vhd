@@ -1,5 +1,3 @@
--- Test comment by Thomas
-
 library IEEE;
 use IEEE.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -8,19 +6,12 @@ use ieee.std_logic_unsigned.all;
 entity PC is
 port( jump_en, branch_en : in std_logic; 
       wr_addr, jump, offset : in  std_logic_vector (7 downto 0);
-      addr : out std_logic_vector (7 downto 0)
-      
-      );
-  end entity;
+      addr : out std_logic_vector (7 downto 0));
+end entity;
   
-  architecture Behav of PC is
-  
-    
-   signal clear : std_logic:='0';
-   begin
-
-
-    
+architecture Behav of PC is
+signal clear : std_logic:='0';
+begin
    process(branch_en, offset, wr_addr, jump_en,jump,clear)
    begin
       if (clear = '0')then
@@ -39,5 +30,4 @@ port( jump_en, branch_en : in std_logic;
         
       end if;
     end process;
-
 end architecture;
