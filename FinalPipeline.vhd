@@ -16,7 +16,6 @@ component Fetch is
         clk, clk_en, interrupt_en,branch,jump: in std_logic;
         PCOut: out std_logic_vector(7 downto 0);
         instruction: out std_logic_vector(15 downto 0)
-        --Mnemonics: out string
       );
 end component;
 FOR ALL: Fetch use entity work.fetch(Behav);
