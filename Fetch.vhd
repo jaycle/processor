@@ -13,39 +13,7 @@ entity fetch is
     end entity;
     
 architecture Behav of fetch is
-   
-      component Mux is 
-         Port(   
-          selectL : in std_logic;
-          Min1 : in std_logic_vector(7 downto 0); --Select if SelectL is low
-          Min2 : in std_logic_vector(7 downto 0); --Select if SelectL is High
-          muxout : out std_logic_vector(7 downto 0)
-          ); end component;
-        
-      component latch is
-      port( in_addr : in std_logic_vector (7 downto 0);
-            clk : in std_logic;
-            out_addr, pc_addr : out std_logic_vector (7 downto 0)
-             );
-      end component;
-      
-      component IMEM is
-		GENERIC (
-		  	add_w: integer := 8;
-		    depth: integer := 2**8;
-		    width: integer := 16);
-		PORT (
-		    Addr:  IN std_logic_vector(add_w-1 DOWNTO 0);
-		    Instr: OUT std_logic_vector(width-1 DOWNTO 0) );
-		END component;
-     
-      component PC is
-          port( 
-          jump_en, branch_en : in std_logic; 
-          wr_addr, jump, offset : in  std_logic_vector (7 downto 0);
-          addr : out std_logic_vector (7 downto 0));  
-      end component;
-    
+
       constant add_w: integer:=8;
       constant depth: integer:=2**8;
 	  constant width: integer:=16;
@@ -55,17 +23,12 @@ architecture Behav of fetch is
       signal jump_en: std_logic;
 --	signal instruction_s: std_logic_vector(15 downto 0);
       signal clk_f: std_logic;
+   
+begin
 
--- binding
-    for all : mux use entity work.mux_2_1(Behavioral);
-    for all : latch use entity work.latch(Behav);
-    for all : IMEM use entity work.IMEM(IMEM_arch);
-     
-    begin
-      
       clk_f <= clk and clk_en;
       
-      mux_pc_Mem : Mux 
+      mux_pc_Mem : entity work.mux_2_1(behav) 
             port map( 
             SelectL => interrupt_en, --Selector
             Min1=> addr_s , --select if low
@@ -73,7 +36,7 @@ architecture Behav of fetch is
             Muxout=> mux_to_Latch
           );
           
-      mem_A : latch
+      mem_A : entity work.latch(behav)
         port map(
           in_addr => mux_to_latch,
           clk => clk,
@@ -83,7 +46,7 @@ architecture Behav of fetch is
           
       PCOut <= reg_to_IMEM;
           
-      PC1 : PC 
+      PC1 : entity work.PC(behav)
         port map(
           jump_en => jump,
           branch_en => branch, 
@@ -92,11 +55,12 @@ architecture Behav of fetch is
           offset=>offset,
           addr=>addr_s);
         
-      IMEM1 : IMEM
+      IMEM1 : entity work.IMEM(imem_arch)
         generic Map(add_w, depth, width)
         port map(
           Addr => reg_to_IMEM,
           Instr => instruction);  
+
         
 --  Name: process(instruction_s)
 --  begin

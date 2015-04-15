@@ -11,7 +11,7 @@ entity mux_2_1 is
           );
 end mux_2_1;
 
-architecture Behavioral of mux_2_1 is
+architecture Behav of mux_2_1 is
 
 begin 
 
@@ -24,4 +24,4 @@ begin
   end if;
 			
 end process;
-end Behavioral;
+end behav;
