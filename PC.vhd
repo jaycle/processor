@@ -15,18 +15,13 @@ begin
    process(clk)
    begin
     if(rising_edge(clk))then
-
-      if (branch_en = '0' and jump_en = '0') then
-        addr <= currentaddress + "00000001"; 
-        
-      
-      elsif (branch_en = '1' and jump_en = '0') then
-         addr <= currentaddress + offset + "00000001";
-        
-      elsif (branch_en = '0' and jump_en = '1') then
-        addr <= jump;
-        
-      end if;
-     end if;
-    end process;
+       	if (branch_en = '1' and jump_en = '0') then
+    	     addr <= currentaddress + offset + "00000001";       
+    	elsif (branch_en = '0' and jump_en = '1') then
+    	    addr <= jump;
+		else
+    	    addr <= currentaddress + "00000001"; 
+    	end if;
+    end if;
+	end process;
 end architecture;
