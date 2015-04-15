@@ -10,13 +10,14 @@ entity fetch is
         instruction: out std_logic_vector(15 downto 0)
  --       Mnemonics: out string(7 downto 1)
       );
-    end entity;
+end entity;
     
 architecture Behav of fetch is
 
       constant add_w: integer:=8;
       constant depth: integer:=2**8;
 	  constant width: integer:=16;
+
       signal mux_to_Latch : std_logic_vector(7 downto 0);
       signal reg_to_IMEM : std_logic_vector(7 downto 0);
       signal addr_s,pc_addr_S : std_logic_vector(7 downto 0);
@@ -26,41 +27,38 @@ architecture Behav of fetch is
    
 begin
 
-      clk_f <= clk and clk_en;
+	clk_f <= clk and clk_en;
       
-      mux_pc_Mem : entity work.mux_2_1(behav) 
-            port map( 
+    mux_pc_Mem : entity work.mux_2_1(behav) 
+      	port map( 
             SelectL => interrupt_en, --Selector
             Min1=> addr_s , --select if low
             Min2=> interrupt_A, --select if high
-            Muxout=> mux_to_Latch
-          );
+            Muxout=> mux_to_Latch);
           
-      mem_A : entity work.latch(behav)
-        port map(
-          in_addr => mux_to_latch,
-          clk => clk,
-          out_addr => reg_to_IMEM,
-          pc_addr => pc_addr_s
-          );
+    mem_A : entity work.latch(behav)
+      	port map(
+        	in_addr => mux_to_latch,
+          	clk => clk,
+          	out_addr => reg_to_IMEM,
+          	pc_addr => pc_addr_s);
           
-      PCOut <= reg_to_IMEM;
+	PCOut <= reg_to_IMEM;
           
-      PC1 : entity work.PC(behav)
-        port map(
-          jump_en => jump,
-          branch_en => branch, 
-          wr_addr => pc_addr_s,
-          jump => jump_A,
-          offset=>offset,
-          addr=>addr_s);
+    PC1 : entity work.PC(behav)
+    	port map(
+        	jump_en => jump,
+          	branch_en => branch, 
+          	wr_addr => pc_addr_s,
+          	jump => jump_A,
+          	offset=>offset,
+          	addr=>addr_s);
         
-      IMEM1 : entity work.IMEM(imem_arch)
+	IMEM1 : entity work.IMEM(imem_arch)
         generic Map(add_w, depth, width)
         port map(
-          Addr => reg_to_IMEM,
-          Instr => instruction);  
-
+        	Addr => reg_to_IMEM,
+          	Instr => instruction);  
         
 --  Name: process(instruction_s)
 --  begin
