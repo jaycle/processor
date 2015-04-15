@@ -4,11 +4,11 @@ use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
 entity decode is
-  port( clk: in std_logic;
+  port( clk, z_flg: in std_logic;
         instruction : in std_logic_vector(15 downto 0);
         rdx,rdy,wr,alu_op,alu_sel : out std_logic_vector (3 downto 0);
-        imData : out std_logic_vector (7 downto 0);
-        ry_im,sel_dmem,wr_en,jump_en : out std_logic
+        imData, offset, jump_addr : out std_logic_vector (7 downto 0);
+        ry_im,sel_dmem,wb_sel,jump_en, branch_en : out std_logic
       );
     end entity;
     
@@ -52,7 +52,7 @@ begin
         
         when no_op =>
         jump_en <= '0';
-        wr_en <='0';
+        wb_sel <='0';
         ry_im<='0';
         sel_dmem<='0';
         alu_op <= instruction(15 downto 12);
@@ -65,7 +65,7 @@ begin
       
         when "0001" =>
           jump_en <= '0';
-          wr_en <='1';
+          wb_sel <='1';
           ry_im <= '1';
           sel_dmem <= '1';
           alu_op <= instruction(15 downto 12);
@@ -77,7 +77,7 @@ begin
           
         when add_sub =>
           jump_en <= '0'; 
-          wr_en <='1';
+          wb_sel <='1';
           ry_im <= '0';
           sel_dmem <= '1';
           alu_op <= instruction(15 downto 12);
@@ -90,7 +90,7 @@ begin
         
         when inc_dec =>
           jump_en <= '0';
-          wr_en <='1';
+          wb_sel <='1';
           ry_im <= '0';
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
@@ -102,7 +102,7 @@ begin
           
         when shift => 
           jump_en <= '0';
-          wr_en <='1';
+          wb_sel <='1';
           ry_im <= '0';
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
@@ -116,7 +116,7 @@ begin
           
           if (instruction (11 downto 8) ="1000" ) then
           jump_en <= '0';
-          wr_en <='1';
+          wb_sel <='1';
           ry_im <= '0';
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
@@ -128,7 +128,7 @@ begin
           
         else
           jump_en <= '0';
-          wr_en <='1';
+          wb_sel <='1';
           ry_im <= '0';
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
@@ -146,7 +146,7 @@ begin
           
         when load_indirect =>
           jump_en <= '0';
-          wr_en <='1';
+          wb_sel <='1';
           ry_im <= '0';
           sel_dmem <= '1';
           alu_op <= instruction(15 downto 12);
@@ -159,7 +159,7 @@ begin
           
         when store_indirect =>
           jump_en <= '0';
-          wr_en <='0';
+          wb_sel <='0';
           ry_im <= '0';
           sel_dmem <= '1';
           alu_op <= instruction(15 downto 12);
@@ -171,7 +171,7 @@ begin
           
         when  load_reg =>
           jump_en <= '0';
-          wr_en <='1';
+          wb_sel <='1';
           ry_im <= '0';
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
@@ -183,7 +183,7 @@ begin
           
         when store_reg =>
           jump_en <= '0';
-          wr_en <='0';
+          wb_sel <='0';
           ry_im <= '0';
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
@@ -195,7 +195,7 @@ begin
           
         when jump =>
           jump_en <= '1';
-          wr_en <='0';
+          wb_sel <='0';
           ry_im <= '0';
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
@@ -207,7 +207,7 @@ begin
           
         when branch_zero =>
           jump_en <= '0';
-          wr_en <='1';
+          wb_sel <='1';
           ry_im <= '0';
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
@@ -220,7 +220,7 @@ begin
           
         when branch_notzero =>
           jump_en <= '0';
-          wr_en <='1';
+          wb_sel <='1';
           ry_im <= '0';
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
