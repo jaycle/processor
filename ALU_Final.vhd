@@ -8,7 +8,7 @@ entity alu is
         
         a_in,b_in : in std_logic_vector (7 downto 0);
         op,sel : in std_logic_vector (3 downto 0);
-        alu_out : out std_logic_vector (7 downto 0)   
+        offset, alu_out : out std_logic_vector (7 downto 0)   
   );
 end entity;
 

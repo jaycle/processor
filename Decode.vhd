@@ -3,17 +3,16 @@ use IEEE.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-entity decoder is
+entity decode is
   port( clk: in std_logic;
         instruction : in std_logic_vector(15 downto 0);
         rdx,rdy,wr,alu_op,alu_sel : out std_logic_vector (3 downto 0);
         imData : out std_logic_vector (7 downto 0);
         ry_im,sel_dmem,wr_en,jump_en : out std_logic
       );
-      
     end entity;
     
-architecture behav of decoder is
+architecture behav of decode is
   
   -- signals
   signal op : std_logic_vector(3 downto 0);
