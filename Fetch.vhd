@@ -6,7 +6,6 @@ Use work.all;
 entity fetch is
   port( offset,jump_A : in std_logic_vector(7 downto 0);
         clk,branch_en,jump_en: in std_logic;
-        PCOut: out std_logic_vector(7 downto 0);
         instruction: out std_logic_vector(15 downto 0)
  --       Mnemonics: out string(7 downto 1)
       );
