@@ -10,18 +10,19 @@ port( jump_en, branch_en, clk : in std_logic;
 end entity;
   
 architecture Behav of PC is
-signal currentaddress : std_logic_vector(7 downto 0):= "00000000";
+signal curr_addr : std_logic_vector (7 downto 0) := "00000000";
 begin
    process(clk)
    begin
-    if(rising_edge(clk))then
+	if(rising_edge(clk))then
        	if (branch_en = '1' and jump_en = '0') then
-    	     addr <= currentaddress + offset + "00000001";       
+    	     curr_addr <= curr_addr + offset + "00000001";		 
     	elsif (branch_en = '0' and jump_en = '1') then
-    	    addr <= jump;
+    	    curr_addr <= jump;
 		else
-    	    addr <= currentaddress + "00000001"; 
+    	    curr_addr <= curr_addr + "00000001"; 
     	end if;
-    end if;
+	 end if;
 	end process;
+	addr <= curr_addr;
 end architecture;
