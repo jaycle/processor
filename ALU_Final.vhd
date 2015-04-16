@@ -27,6 +27,7 @@ process ( rx_in,ry_in,op,sel)
       
    begin
      
+     z_flag <= '0';
      rx:= rx_in;
      ry:= ry_in;
      
@@ -86,11 +87,23 @@ when "0101" =>
   
     elsif sel="0111" then
 		  alu_out <= "11111111";
+
+    elsif sel="1101" then
+		    if rx_in=0 then 
+			alu_out<="00000000"; 
+			z_flag <= '1';
+		   end if;	  
+    
+    elsif sel="1110" then
+		    if rx_in <= "000000001"  then 
+			alu_out<="00000000"; 
+			z_flag <= '1';
+		   end if;	
 	
     elsif sel="1111" then
-		    if rx<ry then alu_out<="11111111"; end if;
+		    if rx_in<ry_in then alu_out<="11111111"; end if;
 		
-		elsif sel="1000" then
+    elsif sel="1000" then
 		    alu_out <= ry; 
 		  
 		end if;
