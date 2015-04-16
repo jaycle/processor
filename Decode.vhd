@@ -8,7 +8,7 @@ entity decode is
         instruction : in std_logic_vector(15 downto 0);
         rdx,rdy,wr,alu_op,alu_sel : out std_logic_vector (3 downto 0);
         imData, offset, jump_addr : out std_logic_vector (7 downto 0);
-        ry_im,sel_dmem,wb_sel,jump_en, branch_en : out std_logic
+        ry_im, sel_dmem, wb_sel, jump_en, branch_en, w_en : out std_logic
       );
     end entity;
     
@@ -50,7 +50,8 @@ begin
       --if clk'event and clk='1' then     this is to try to get clock for interrupt working
       case op is
         
-        when no_op =>
+    when no_op =>
+		w_en <= '0';
         jump_en <= '0';
         wb_sel <='0';
         ry_im<='0';
@@ -63,7 +64,8 @@ begin
         imData <=instruction(7 downto 0);
         
       
-        when "0001" =>
+	when add_im =>
+		  w_en <= '1';
           jump_en <= '0';
           wb_sel <='1';
           ry_im <= '1';
@@ -76,6 +78,7 @@ begin
           rdy <= instruction(7 downto 4); 
           
         when add_sub =>
+			w_en <= '1';
           jump_en <= '0'; 
           wb_sel <='1';
           ry_im <= '0';
@@ -89,6 +92,7 @@ begin
           
         
         when inc_dec =>
+		w_en <= '1';
           jump_en <= '0';
           wb_sel <='1';
           ry_im <= '0';
@@ -100,7 +104,8 @@ begin
           rdx <= instruction(3 downto 0);
           rdy <= instruction(7 downto 4); 
           
-        when shift => 
+        when shift =>
+     	  w_en <= '0'; 
           jump_en <= '0';
           wb_sel <='1';
           ry_im <= '0';
@@ -114,7 +119,8 @@ begin
           
         when alu_logic =>
           
-          if (instruction (11 downto 8) ="1000" ) then
+          if (instruction (11 downto 8) ="1000" ) then  -- MOV instruction
+		  w_en <= '1';
           jump_en <= '0';
           wb_sel <='1';
           ry_im <= '0';
@@ -127,6 +133,7 @@ begin
           rdy <= instruction(7 downto 4);
           
         else
+		  w_en <= '1';   -- need to handle SLT instruction
           jump_en <= '0';
           wb_sel <='1';
           ry_im <= '0';
@@ -145,6 +152,7 @@ begin
           
           
         when load_indirect =>
+		  w_en <= '1';
           jump_en <= '0';
           wb_sel <='1';
           ry_im <= '0';
@@ -158,6 +166,7 @@ begin
           
           
         when store_indirect =>
+		  w_en <= '0';
           jump_en <= '0';
           wb_sel <='0';
           ry_im <= '0';
@@ -170,6 +179,7 @@ begin
           rdy <= instruction(7 downto 4);
           
         when  load_reg =>
+		  w_en <= '1';
           jump_en <= '0';
           wb_sel <='1';
           ry_im <= '0';
@@ -182,6 +192,7 @@ begin
           rdy <= instruction(7 downto 4);
           
         when store_reg =>
+		  w_en <= '0';
           jump_en <= '0';
           wb_sel <='0';
           ry_im <= '0';
@@ -194,6 +205,7 @@ begin
           rdy <= instruction(7 downto 4);
           
         when jump =>
+		  w_en <= '0';
           jump_en <= '1';
           wb_sel <='0';
           ry_im <= '0';
@@ -206,6 +218,7 @@ begin
           rdy <= instruction(7 downto 4);
           
         when branch_zero =>
+		  w_en <= '0';
           jump_en <= '0';
           wb_sel <='1';
           ry_im <= '0';
@@ -219,6 +232,7 @@ begin
           
           
         when branch_notzero =>
+		  w_en <= '0';
           jump_en <= '0';
           wb_sel <='1';
           ry_im <= '0';
