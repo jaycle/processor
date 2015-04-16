@@ -3,82 +3,83 @@ use IEEE.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-entity alu is
+entity alu_final is
   port( -- in/out variables
         
-        a_in,b_in : in std_logic_vector (7 downto 0);
+        rx_in,ry_in : in std_logic_vector (7 downto 0);
         op,sel : in std_logic_vector (3 downto 0);
-        offset, alu_out : out std_logic_vector (7 downto 0)   
+        alu_out : out std_logic_vector (7 downto 0);
+	z_flag : out std_logic   
   );
 end entity;
 
-architecture behav of alu is
+architecture behav of alu_final is
 
 begin
 
-process ( a_in,b_in,op,sel)
+process ( rx_in,ry_in,op,sel)
    
       
-      variable a ,b : std_logic_vector(7 downto 0);
+      variable rx ,ry : std_logic_vector(7 downto 0);
       variable z : std_logic_vector (7 downto 0);
       variable shift: integer;
       
       
    begin
      
-     a:= a_in;
-     b:= b_in;
+     rx:= rx_in;
+     ry:= ry_in;
      
-     shift := conv_integer(b);
+     shift := conv_integer(ry);
      
 case op is
   
     
-when "0001" => alu_out <= a + b; 
+when "0001" => alu_out <= rx + ry; 
   
 when "0010" => 
 		if sel="0000" then
-		alu_out <= a+b;
+		alu_out <= rx+ry;
 	
 		elsif sel="0001" then
-		alu_out <= a-b;
+		alu_out <= rx-ry;
 		end if;
   
 when "0011" => 
 		if sel="0000" then
-		alu_out <= a+1;
+		alu_out <= rx+1;
 		
 		elsif sel="0001" then
-		alu_out <= a-1;
+		alu_out <= rx-1;
 		end if;
   
 when "0100" => 
 		if sel="0000" then
-		alu_out <= to_stdlogicvector(to_bitvector(a) sll shift);
+		alu_out <= to_stdlogicvector(to_bitvector(rx) sll shift);
 			
 		elsif sel="0001" then
-		alu_out <= to_stdlogicvector(to_bitvector(a) srl shift);
+		alu_out <= to_stdlogicvector(to_bitvector(rx) srl shift);
 		
 		end if;
   
 when "0101" => 
 		if sel="0000" then
-		alu_out <= not a;
+		alu_out <= not rx;
 		
    	elsif sel="0001" then
-		alu_out <= a NOR b;
+		alu_out <= rx NOR ry;
 
     elsif sel="0010" then
-		alu_out <= a NAND b;
+		alu_out <= rx NAND ry;
 		
     elsif sel="0011" then
-		alu_out <= a XOR b;
+		alu_out <= rx XOR ry;
 	
     elsif sel="0100" then
-		 alu_out <= a AND b;
+		 alu_out <= rx AND ry;
 		
     elsif sel="0101" then
-		 alu_out <= a OR b;
+		 alu_out <= rx OR ry;
  
     elsif sel="0110" then
 		  alu_out <= "00000000"; 
@@ -87,10 +88,10 @@ when "0101" =>
 		  alu_out <= "11111111";
 	
     elsif sel="1111" then
-		    if a<b then alu_out<="11111111"; end if;
+		    if rx<ry then alu_out<="11111111"; end if;
 		
 		elsif sel="1000" then
-		    alu_out <= b; 
+		    alu_out <= ry; 
 		  
 		end if;
 		
