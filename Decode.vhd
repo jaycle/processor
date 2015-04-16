@@ -247,7 +247,8 @@ begin
           
         --when  return_interupt
           
-      when others => null;
+      when others => null; 
+		-- should set all outputs to something to avoid registers
         
       end case;
       
