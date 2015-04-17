@@ -91,6 +91,8 @@ when "0101" =>
     elsif sel="1111" then		-- set if less than
 	    if rx_in<ry_in then 
 			alu_out<="11111111"; 
+		else
+			alu_out <= rx_in;
 		end if;
 
     elsif sel="1000" then		-- Move (Ry <= Rx)
