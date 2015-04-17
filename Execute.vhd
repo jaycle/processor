@@ -6,7 +6,7 @@ Use work.all;
 entity Execute is
   
   port ( 
-          wb_in : in std_logic;
+	  clk : in std_logic;
           ry_IM: in std_logic;
 	  w_en : in std_logic;
 	  sel_dmem : in std_logic;
@@ -19,7 +19,6 @@ entity Execute is
           WrBk : in std_logic_vector(7 downto 0);  
           dmem_out : out std_logic_vector(7 downto 0); 
           ALU_out : out std_logic_vector(7 downto 0);
-	  wb_out :out std_logic;
           Zflg : out std_logic
           );
     end Execute;
@@ -31,6 +30,7 @@ component Register_Bank is
     S : integer;
     W : integer);
   PORT (
+    clk:        in std_logic;
     Rdx, Rdy:   IN std_logic_vector(S-1 DOWNTO 0); --Address inputs
     WrBk:       IN std_logic_vector(W-1 DOWNTO 0); --Write back data
     WrAddr:     IN std_logic_vector(S-1 DOWNTO 0); --Address to write data into
@@ -83,7 +83,8 @@ for all: Register_bank use entity work.Register_bank(Register_bank_arch);
  RB : Register_Bank
  generic map (S=>S , W=>W) 
   port map (        
-              Rdx=> Rx,
+              clk => clk,      
+	      Rdx=> Rx,
               Rdy=> Ry,
               WrBk=> WrBk,
               WrAddr=> wrAddr,
@@ -105,7 +106,7 @@ Mux_Dec_to_ALU: Mux
   port map(
             SelectL => sel_dmem, --Selector
             Min1=> IM_data, --select if low
-            Min2=> Ry_R, --select if high
+            Min2=> Rx_R, --select if high
             Muxout=> dAddr
           );
 ALU_P : ALU
@@ -126,5 +127,4 @@ memory : dmem
        location_address => dAddr,
        data_out =>  dmem_out
 	);
-wb_out <= wb_in;
 end arch; 

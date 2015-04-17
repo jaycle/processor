@@ -8,7 +8,7 @@ ENTITY REGISTER_BANK IS
     S : integer := 4;
     W : integer := 8);
   PORT (
-	clk	:		in std_logic; 
+    clk	:		in std_logic; 
     Rdx, Rdy:   IN std_logic_vector(S-1 DOWNTO 0); --Address inputs
     WrBk:       IN std_logic_vector(W-1 DOWNTO 0); --Write back data
     WrAddr:     IN std_logic_vector(S-1 DOWNTO 0); --Address to write data into
