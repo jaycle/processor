@@ -1,6 +1,6 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
-USE ieee.std_logic_arith.ALL;
+USE ieee.numeric_std.ALL;
 USE ieee.std_logic_unsigned.ALL;
 
 ENTITY REGISTER_BANK IS
@@ -8,6 +8,7 @@ ENTITY REGISTER_BANK IS
     S : integer := 4;
     W : integer := 8);
   PORT (
+	clk	:		in std_logic; 
     Rdx, Rdy:   IN std_logic_vector(S-1 DOWNTO 0); --Address inputs
     WrBk:       IN std_logic_vector(W-1 DOWNTO 0); --Write back data
     WrAddr:     IN std_logic_vector(S-1 DOWNTO 0); --Address to write data into
@@ -23,20 +24,25 @@ ARCHITECTURE REGISTER_BANK_ARCH OF REGISTER_BANK IS
   SIGNAL REG: DATA := (others => (others => '0')); --Internal signal that holds the data of the registers
 BEGIN
   
-  PROCESS(Rdx, Rdy, Wr, WrBk)
-  VARIABLE index: integer := 0; --Integer variable used to hold the address to read/write
+  PROCESS(clk)
   BEGIN
    -- IF( Interrupts = '0' ) THEN --If Interrupts is low then the registers function as normal.
-      index := conv_integer(Rdx); --Convert Rdx address into integer type
-      Rx <= REG(index); --Data from the register at "index" is outputted via Rx
+	if (rising_edge(clk)) then
+
+	-- Read from register on rising edge
+      Rx <= REG(to_integer(unsigned(Rdx)));       
+      Ry <= REG(to_integer(unsigned(Rdy))); 
       
-      index := conv_integer(Rdy);--Convert Rdy address into integer type
-      Ry <= REG(index); --Data from the register at "index" is outputted via Ry
-      
-      IF( Wr = '1' ) THEN --If write is enabled
-        index := conv_integer(WrAddr); --Convert Rdx address into integer type
-        REG(index) <= WrBk; --Write back data is written into the register at "index"
-      END IF;
+	elsif (falling_edge(clk)) then
+	-- write only on falling edge
+      IF( Wr = '1' ) THEN
+        REG(to_integer(unsigned(WrAddr))) <= WrBk; --Write back data is written into the register at "index"
+      else
+		null;		-- do nothing
+	  end if; -- wr
+	end if; -- clk
+
+
 --    ELSIF( Interrupts = '1' ) THEN --If Ir is high then the registers are either being written into the scratchpad or 
                            --the registers are receiving values from the scratchpad.
 --      index := conv_integer(Rdx);
