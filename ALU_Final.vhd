@@ -31,7 +31,6 @@ process ( rx_in,ry_in,op,sel)
      rx:= rx_in;
      ry:= ry_in;
      
-     shift := conv_integer(ry);
      
 case op is
   
@@ -55,6 +54,7 @@ when "0011" =>
 		end if;
   
 when "0100" => 
+        shift := conv_integer(ry);
 		if sel="0000" then
 		alu_out <= to_stdlogicvector(to_bitvector(rx) sll shift);
 			
