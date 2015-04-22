@@ -20,10 +20,6 @@ entity decode is
 
 architecture behav of decode is
   
-  -- signals
-  signal op : std_logic_vector(3 downto 0);
-  signal sel : std_logic_vector(3 downto 0);
-  
   -- states listed as constants
   
   constant no_op : std_logic_vector := "0000";
@@ -43,12 +39,12 @@ architecture behav of decode is
 
   
 begin
-  
-  
-	op <= instruction(15 downto 12);
-	sel <= instruction (11 downto 8);
+
   
 	process(instruction)
+	-- variable declarations 
+	variable op : std_logic_vector(3 downto 0);
+    variable sel : std_logic_vector(3 downto 0);
 	begin
 --	if (rising_edge(clk)) then
 
@@ -61,6 +57,11 @@ begin
     wb_sel <='0';
     ry_im<='0';
     sel_dmem<='0';
+
+	-- variable (re)assignment
+	op := instruction(15 downto 12);
+	sel := instruction (11 downto 8);
+
 	
 	case op is
         
@@ -88,7 +89,7 @@ begin
           alu_sel <= instruction (11 downto 8);   
           wr <= instruction(11 downto 8);
           imData <=instruction(7 downto 0);
-          rdx <= instruction(3 downto 0);
+          rdx <= instruction(11 downto 8);
           rdy <= instruction(7 downto 4); 
           
         when add_sub =>
