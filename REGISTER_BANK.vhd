@@ -19,7 +19,7 @@ ENTITY REGISTER_BANK IS
 END REGISTER_BANK;
 
 ARCHITECTURE REGISTER_BANK_ARCH OF REGISTER_BANK IS
-  TYPE DATA IS array((2**S)-1 DOWNTO 0) OF std_logic_vector(W-1 DOWNTO 0);
+  TYPE DATA IS array(0 to (2**S-1)) OF std_logic_vector(W-1 DOWNTO 0);
   
   SIGNAL REG: DATA := (others => (others => '0')); --Internal signal that holds the data of the registers
 BEGIN
