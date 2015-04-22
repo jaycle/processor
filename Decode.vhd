@@ -82,7 +82,7 @@ begin
 	when add_im =>
 		  w_en <= '1';
           jump_en <= '0';
-          wb_sel <='1';
+          wb_sel <='0';
           ry_im <= '1';
           sel_dmem <= '1';
           alu_op <= instruction(15 downto 12);
@@ -95,7 +95,7 @@ begin
         when add_sub =>
 		  w_en <= '1';
           jump_en <= '0'; 
-          wb_sel <='1';
+          wb_sel <='0';
           ry_im <= '0';
           sel_dmem <= '1';
           alu_op <= instruction(15 downto 12);
@@ -109,7 +109,7 @@ begin
         when inc_dec =>
 		  w_en <= '1';
           jump_en <= '0';
-          wb_sel <='1';
+          wb_sel <='0';
           ry_im <= '0';
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
@@ -122,7 +122,7 @@ begin
         when shift =>
      	  w_en <= '0'; 
           jump_en <= '0';
-          wb_sel <='1';
+          wb_sel <='0';
           ry_im <= '0';
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
@@ -137,7 +137,7 @@ begin
           if (instruction (11 downto 8) ="1000" ) then  -- MOV instruction
 		  w_en <= '1';
           jump_en <= '0';
-          wb_sel <='1';
+          wb_sel <='0';
           ry_im <= '0';
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
@@ -150,12 +150,12 @@ begin
         else
 		  w_en <= '1';   
           jump_en <= '0';
-          wb_sel <='1';
+          wb_sel <='0';
           ry_im <= '0';
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
           alu_sel <= instruction (11 downto 8);  
-          wr <= instruction(3 downto 0);
+		  wr <= instruction(3 downto 0); -- Rx is write as usual
           imData <=instruction(7 downto 0); 
           rdx <= instruction(3 downto 0);
           rdy <= instruction(7 downto 4);
@@ -183,7 +183,7 @@ begin
         when store_indirect =>
 		  w_en <= '0';
           jump_en <= '0';
-          wb_sel <='0';
+          wb_sel <='1';
           ry_im <= '0';
           sel_dmem <= '1';
           alu_op <= instruction(15 downto 12);
@@ -209,7 +209,7 @@ begin
         when store_reg =>
 		  w_en <= '0';
           jump_en <= '0';
-          wb_sel <='0';
+          wb_sel <='1';
           ry_im <= '0';
           sel_dmem <= '0';  -- select ImData
           alu_op <= instruction(15 downto 12);
@@ -236,7 +236,7 @@ begin
         when branch_zero =>
 		  w_en <= '0';
           jump_en <= '0';
-          wb_sel <='1';	
+          wb_sel <='0';	
           ry_im <= '0';
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
@@ -254,7 +254,7 @@ begin
         when branch_notzero =>
 		  w_en <= '0';
           jump_en <= '0';
-          wb_sel <='1';
+          wb_sel <='0';
           ry_im <= '0';
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
