@@ -25,7 +25,9 @@ process(ALUop, writeData,Location_address) is
       if ALUop = "1001" or ALUop ="1011" then  --Store
         mem(to_integer(unsigned(location_address))) <= WriteData;
     elsif(ALUop="1000" or ALUop = "1010") then --Load
-       data_out <= mem(to_integer(unsigned(location_address)));    
+       data_out <= mem(to_integer(unsigned(location_address))); 
+	else
+		data_out <= (others => '0');   
     end if;
 
   end process;
