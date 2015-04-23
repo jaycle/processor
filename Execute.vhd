@@ -59,6 +59,7 @@ end component;
 component DMEM is
   generic(N:integer := 8); 
   port(
+	   clk : in std_logic;
        ALUop :in std_logic_vector(3 downto 0);
        writeData :in std_logic_vector(N-1 downto 0);
        location_address : in std_logic_vector(N-1 downto 0);
@@ -122,8 +123,9 @@ ALU_P : ALU
             
 memory : dmem
   port map(
+	   clk => clk,
        ALUop => ALUop,
-       writeData => Rx_R,
+       writeData => Ry_R,
        location_address => dAddr,
        data_out =>  dmem_out
 	);
