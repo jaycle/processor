@@ -47,12 +47,10 @@ architecture behav of decode is
 begin
 
   
-	decode : process(instruction, clk)
+	decode : process(instruction)
 	-- variable declarations 
 	variable op : std_logic_vector(3 downto 0);
     variable sel : std_logic_vector(3 downto 0);
-	variable cnt : natural range 0 to 2; -- index for reg
-	variable stall : natural range 0 to 2 := 0; -- stall length for hazard
 
 	begin
 
@@ -294,23 +292,33 @@ begin
         imData <=instruction(7 downto 0);
         
       end case;
+    end process;
+-------------- End decode section -----------------
 
--------------- End decode section -------
 
--------------- begin haz check section --
 
-	if (rising_edge(clk)) then  -- ensures count increases even if instruction doesn't change
-		cnt := cnt + 1;  				-- cycles 0 -> 1 -> 2 -> 1 -> etc...
-		reg(cnt) <= w_en_sig & wr_sig;  -- 1 in MSB denotes register expects to be written
-		
-		if (stall = 0) then
+-------------- begin haz check section ------------
+	
+	-- process which updates haz register each clock cycle regardless of instruction change
+	haz_update : process(clk) is
+
+	variable stall : natural range 0 to 2 := 0; -- stall length for hazard
+
+	begin
+	if (rising_edge(clk)) then  
+		-- move hazards down through register
+		reg(0) <= reg(1);
+		reg(1) <= reg(2);
+		reg(2) <= w_en_sig & wr_sig;  -- 1 in MSB denotes register expects to be written
+				
 			-- get stall length based upon hazard location in pipeline
-			if (reg(cnt - 1)(4) = '1') then
-				if (rdx_sig = reg(cnt - 1)(3 downto 0) or (rdy_sig = reg(cnt - 1)(3 downto 0))) then
+		if (stall = 0) then
+			if (reg(1)(4) = '1') then
+				if (rdx_sig = reg(1)(3 downto 0) or (rdy_sig = reg(1)(3 downto 0))) then
 					stall := 2;
 				end if;
-			elsif (reg(cnt - 2)(4) = '1') then
-				if (rdx_sig = reg(cnt - 2)(3 downto 0) or (rdy_sig = reg(cnt - 2)(3 downto 0))) then
+			elsif (reg(0)(4) = '1') then
+				if (rdx_sig = reg(0)(3 downto 0) or (rdy_sig = reg(0)(3 downto 0))) then
 					stall := 1;
 				end if;
 			else
@@ -318,6 +326,7 @@ begin
 		    end if;
 		end if;
 		
+		-- Take action based upon detected hazards
 		if (stall = 0) then
 			-- no hazards. Update outputs as normal
 			w_en <= w_en_sig;
@@ -328,8 +337,7 @@ begin
 			branch_en <= '1';
 			offset <= std_logic_vector(to_signed(-stall, offset'length));
 			stall := stall - 1;
-
-			-- zeros down pipeline
+				-- zeros down pipeline
 			wr <= (others => '0');
 			w_en <= '0';
 			rdx <= (others => '0');
@@ -342,14 +350,9 @@ begin
 	        rdx_sig <= (others => '0');
 	        imData <= (others => '0');
 		end if;
-			
-	
-	end if; -- clk
-      
-
-      
-    end process;
-    			
+	end if;
+	end process;
+	    			
   
 
 end behav;
