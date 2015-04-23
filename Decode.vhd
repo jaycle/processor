@@ -73,9 +73,9 @@ begin
         sel_dmem<='0';
         alu_op <= instruction(15 downto 12);
         alu_sel <= instruction (11 downto 8); 
-        wr <= instruction(3 downto 0);
-        rdx <= instruction(3 downto 0);
-        rdy <= instruction(7 downto 4); 
+        wr <= instruction(7 downto 4);
+          rdy <= instruction(3 downto 0);
+          rdx <= instruction(7 downto 4);
         imData <=instruction(7 downto 0);
         
       
@@ -100,10 +100,10 @@ begin
           sel_dmem <= '1';
           alu_op <= instruction(15 downto 12);
           alu_sel <= instruction (11 downto 8);  
-          wr <= instruction(3 downto 0);
+          wr <= instruction(7 downto 4);
           imData <=instruction(7 downto 0); 
-          rdx <= instruction(3 downto 0);
-          rdy <= instruction(7 downto 4); 
+          rdy <= instruction(3 downto 0);
+          rdx <= instruction(7 downto 4); 
           
         
         when inc_dec =>
@@ -114,10 +114,10 @@ begin
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
           alu_sel <= instruction (11 downto 8);  
-          wr <= instruction(3 downto 0);
+          wr <= instruction(7 downto 4);
           imData <=instruction(7 downto 0); 
-          rdx <= instruction(3 downto 0);
-          rdy <= instruction(7 downto 4); 
+          rdy <= instruction(3 downto 0);
+          rdx <= instruction(7 downto 4);
           
         when shift =>
      	  w_en <= '0'; 
@@ -127,10 +127,10 @@ begin
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
           alu_sel <= instruction (11 downto 8);  
-          wr <= instruction(3 downto 0);
+          wr <= instruction(7 downto 4);
           imData <=instruction(7 downto 0); 
-          rdx <= instruction(3 downto 0);
-          rdy <= instruction(7 downto 4);
+          rdy <= instruction(3 downto 0);
+          rdx <= instruction(7 downto 4);
           
         when alu_logic =>
           
@@ -142,10 +142,10 @@ begin
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
           alu_sel <= instruction (11 downto 8);  
-          wr <= instruction(7 downto 4);  -- select Ry as write address
+          wr <= instruction(3 downto 0);  -- select Ry as write address
           imData <=instruction(7 downto 0); 
-          rdx <= instruction(3 downto 0);
-          rdy <= instruction(7 downto 4);
+          rdy <= instruction(3 downto 0);
+          rdx <= instruction(7 downto 4);
           
         else
 		  w_en <= '1';   
@@ -155,10 +155,10 @@ begin
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
           alu_sel <= instruction (11 downto 8);  
-		  wr <= instruction(3 downto 0); -- Rx is write as usual
+		  wr <= instruction(7 downto 4); -- Rx is write as usual
           imData <=instruction(7 downto 0); 
-          rdx <= instruction(3 downto 0);
-          rdy <= instruction(7 downto 4);
+          rdy <= instruction(3 downto 0);
+          rdx <= instruction(7 downto 4);
           
           
         end if;
@@ -174,7 +174,7 @@ begin
           sel_dmem <= '1';  
           alu_op <= instruction(15 downto 12);
           alu_sel <= instruction (11 downto 8);  
-          wr <= instruction(3 downto 0);   --Rx
+          wr <= instruction(7 downto 4);   --Rx
           imData <=instruction(7 downto 0); 
           rdx <= instruction(7 downto 4);  -- actually Ry b/c dumb ISA
           rdy <= instruction(7 downto 4);
@@ -188,7 +188,7 @@ begin
           sel_dmem <= '1';
           alu_op <= instruction(15 downto 12);
           alu_sel <= instruction (11 downto 8);  
-          wr <= instruction(3 downto 0);
+          wr <= instruction(7 downto 4);
           imData <=instruction(7 downto 0); 
           rdx <= instruction(3 downto 0);
           rdy <= instruction(7 downto 4);
@@ -230,8 +230,8 @@ begin
           alu_sel <= instruction (11 downto 8);  
           wr <= instruction(3 downto 0);
           imData <=instruction(7 downto 0); 
-          rdx <= instruction(3 downto 0);
-          rdy <= instruction(7 downto 4);
+          rdy <= instruction(3 downto 0);
+          rdx <= instruction(7 downto 4);
           
         when branch_zero =>
 		  w_en <= '0';
@@ -243,8 +243,8 @@ begin
           alu_sel <= instruction (11 downto 8);  
           wr <= instruction(3 downto 0);
           imData <=instruction(7 downto 0); 
-          rdx <= instruction(3 downto 0);
-          rdy <= instruction(7 downto 4);
+          rdy <= instruction(3 downto 0);
+          rdx <= instruction(7 downto 4);
 			if (z_flg = '0') then
 				branch_en <= '1';
 				offset <= instruction(7 downto 0);
@@ -261,8 +261,8 @@ begin
           alu_sel <= instruction (11 downto 8);  
           wr <= instruction(3 downto 0);
           imData <=instruction(7 downto 0); 
-          rdx <= instruction(3 downto 0);
-          rdy <= instruction(7 downto 4);
+          rdy <= instruction(3 downto 0);
+          rdx <= instruction(7 downto 4);
 			if (z_flg = '1') then
 				branch_en <= '1';
 				offset <= instruction(7 downto 0);
@@ -281,8 +281,8 @@ begin
         alu_op <= instruction(15 downto 12);
         alu_sel <= instruction (11 downto 8); 
         wr <= instruction(3 downto 0);
-        rdx <= instruction(3 downto 0);
-        rdy <= instruction(7 downto 4); 
+        rdy <= instruction(3 downto 0);
+        rdx <= instruction(7 downto 4); 
         imData <=instruction(7 downto 0);
         
       end case;
