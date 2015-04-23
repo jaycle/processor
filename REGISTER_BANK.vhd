@@ -24,22 +24,20 @@ ARCHITECTURE REGISTER_BANK_ARCH OF REGISTER_BANK IS
   SIGNAL REG: DATA := (others => (others => '0')); --Internal signal that holds the data of the registers
 BEGIN
   
-  PROCESS(clk)
+  PROCESS(clk, Rdx, Rdy)
   BEGIN
    -- IF( Interrupts = '0' ) THEN --If Interrupts is low then the registers function as normal.
-	if (rising_edge(clk)) then
 
-	-- Read from register on rising edge
-      Rx <= REG(to_integer(unsigned(Rdx)));       
-      Ry <= REG(to_integer(unsigned(Rdy))); 
-      
-	elsif (falling_edge(clk)) then
+--  Default values 
+  Rx <= REG(to_integer(unsigned(Rdx)));       
+  Ry <= REG(to_integer(unsigned(Rdy))); 
+
+	if (falling_edge(clk)) then
 	-- write only on falling edge
-      IF( Wr = '1' ) THEN
-        REG(to_integer(unsigned(WrAddr))) <= WrBk; --Write back data is written into the register at "index"
-      else
-		null;		-- do nothing
+     	  IF( Wr = '1' ) THEN
+     	       REG(to_integer(unsigned(WrAddr))) <= WrBk; --Write back data is written into the register at "index"
 	  end if; -- wr
+
 	end if; -- clk
 
 
