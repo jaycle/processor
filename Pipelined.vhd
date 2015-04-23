@@ -57,7 +57,7 @@ decoder : entity work.decode(Behav)
           );
 
 
-decode_execute : entity work.decode_execute(Behav)
+decode_execute : entity work.decode_execute(arch)
   Port Map(   
           clk => clk,
           rdx_in => RX_to_reg,
