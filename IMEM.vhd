@@ -52,8 +52,10 @@ BEGIN
 	MEM(1) <= ADDI 	& "0000" & "00001111";
 	MEM(2) <= ADDI 	& "0001" & "00110011";
 	MEM(3) <= ADDI  & "0010" & "10001000";
-	MEM(4) <= NOP;
-	MEM(5) <= NOP;
+	MEM(4) <= ADDI	& "0101" & "10101010";
+	MEM(5) <= ADDI 	& "0110" & "10111011";
+	MEM(6) <= NOP;
+	MEM(7) <= NOP;
 	MEM(8) <= NOP;
 	MEM(9) <= ADD  	& "0011" & "0000";
 	MEM(10) <= SUB 	& "0010" & "0001";
@@ -69,11 +71,11 @@ BEGIN
 	MEM(20) <=LAND 	& "0010" & "0000";
 	MEM(21) <=LOR  	& "0011" & "0000";
 	MEM(22) <=CLR  	& "0100" & "0000";  -- clear reg for slt instr
-	MEM(23) <=SET  	& "0101" & "0000";  -- set reg for slt instr
+	MEM(23) <=SET  	& "0111" & "0000";  -- set reg for slt instr
 	MEM(24) <=SLT 	& "0100" & "0101";  -- Rx should go from zero to 1
-	MEM(25) <=MOV  	& "0100" & "1111";  -- Last Rx to reg15
+	MEM(25) <=MOV  	& "0000" & "1111";  -- Last Rx to reg15
 	MEM(26) <=EI	& "0000" & "1111";  -- enables all 4 interupts
-	MEM(27) <= STIN & "1111" & "0000";  -- store Value at Ry into MEM[1]
+	MEM(27) <= STIN & "0010" & "1101";  -- store Value at Ry into MEM[0] 
 	MEM(28) <= LDIN & "1110" & "1111";  -- load back Value into R14
 	MEM(29) <= STR	& "0000" & "00000010" ; -- store in MEM[2]
 	MEM(30) <= LDR	& "0001" & "00000010" ; -- load from MEM[2]
@@ -85,7 +87,7 @@ BEGIN
 
 
    -- ask about JZ and JNZ commands  
-  Output: process(addr)
+  Output: process(addr) is
   begin
     Instr <= MEM(conv_integer(Addr));
   end process Output;  
