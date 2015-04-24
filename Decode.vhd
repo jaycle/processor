@@ -36,10 +36,9 @@ architecture behav of decode is
   constant branch_notzero : std_logic_vector := "1110";
 
 -- signal declarations
-	signal w_en_sig : std_logic;
-	signal wr_sig : std_logic_vector(3 downto 0);
-	signal rdx_sig : std_logic_vector(3 downto 0);
-	signal rdy_sig : std_logic_vector(3 downto 0);  
+ 
+	signal w_en_internal : std_logic;
+	signal wr_internal : std_logic_vector(3 downto 0);
 
 	type data is array(0 to 2) of std_logic_vector(4 downto 0);  -- MSB is hazard, 3 downto 0 is address
     signal reg : data := (others => (others => '0'));  -- holds hazards and address
@@ -51,6 +50,12 @@ begin
 	-- variable declarations 
 	variable op : std_logic_vector(3 downto 0);
     variable sel : std_logic_vector(3 downto 0);
+	variable stall : natural range 0 to 2 := 0; -- stall length for hazard
+
+	variable w_en_sig : std_logic;
+	variable wr_sig : std_logic_vector(3 downto 0);
+	variable rdx_sig : std_logic_vector(3 downto 0);
+	variable rdy_sig : std_logic_vector(3 downto 0); 
 
 	begin
 
@@ -59,7 +64,7 @@ begin
 	offset <= "00000000";
 	jump_addr <= "00000000";
 	jump_en <= '0';
-	w_en_sig <= '0';
+	w_en_sig := '0';
     wb_sel <='0';
     ry_im<='0';
     sel_dmem<='0';
@@ -72,99 +77,99 @@ begin
 	case op is
         
     when no_op =>
-		w_en_sig <= '0';
+		w_en_sig := '0';
         jump_en <= '0';
         wb_sel <='0';
         ry_im<='0';
         sel_dmem<='0';
         alu_op <= instruction(15 downto 12);
         alu_sel <= instruction (11 downto 8); 
-       wr_sig<= instruction(7 downto 4);
-          rdy_sig <= instruction(3 downto 0);
-          rdx_sig <= instruction(7 downto 4);
+       wr_sig:= instruction(7 downto 4);
+          rdy_sig := instruction(3 downto 0);
+          rdx_sig := instruction(7 downto 4);
         imData <=instruction(7 downto 0);
         
       
 	when add_im =>
-		  w_en_sig <= '1';
+		  w_en_sig := '1';
           jump_en <= '0';
           wb_sel <='0';
           ry_im <= '1';
           sel_dmem <= '1';
           alu_op <= instruction(15 downto 12);
           alu_sel <= instruction (11 downto 8);   
-         wr_sig<= instruction(11 downto 8);
+         wr_sig:= instruction(11 downto 8);
           imData <=instruction(7 downto 0);
-          rdx_sig <= instruction(11 downto 8);
-          rdy_sig <= instruction(7 downto 4); 
+          rdx_sig := instruction(11 downto 8);
+          rdy_sig := instruction(7 downto 4); 
           
         when add_sub =>
-		  w_en_sig <= '1';
+		  w_en_sig := '1';
           jump_en <= '0'; 
           wb_sel <='0';
           ry_im <= '0';
           sel_dmem <= '1';
           alu_op <= instruction(15 downto 12);
           alu_sel <= instruction (11 downto 8);  
-         wr_sig<= instruction(7 downto 4);
+         wr_sig:= instruction(7 downto 4);
           imData <=instruction(7 downto 0); 
-          rdy_sig <= instruction(3 downto 0);
-          rdx_sig <= instruction(7 downto 4); 
+          rdy_sig := instruction(3 downto 0);
+          rdx_sig := instruction(7 downto 4); 
           
         
         when inc_dec =>
-		  w_en_sig <= '1';
+		  w_en_sig := '1';
           jump_en <= '0';
           wb_sel <='0';
           ry_im <= '0';
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
           alu_sel <= instruction (11 downto 8);  
-         wr_sig<= instruction(7 downto 4);
+         wr_sig:= instruction(7 downto 4);
           imData <=instruction(7 downto 0); 
-          rdy_sig <= instruction(3 downto 0);
-          rdx_sig <= instruction(7 downto 4);
+          rdy_sig := instruction(3 downto 0);
+          rdx_sig := instruction(7 downto 4);
           
         when shift =>
-     	  w_en_sig <= '0'; 
+     	  w_en_sig := '0'; 
           jump_en <= '0';
           wb_sel <='0';
           ry_im <= '0';
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
           alu_sel <= instruction (11 downto 8);  
-         wr_sig<= instruction(7 downto 4);
+         wr_sig:= instruction(7 downto 4);
           imData <=instruction(7 downto 0); 
-          rdy_sig <= instruction(3 downto 0);
-          rdx_sig <= instruction(7 downto 4);
+          rdy_sig := instruction(3 downto 0);
+          rdx_sig := instruction(7 downto 4);
           
         when alu_logic =>
           
           if (instruction (11 downto 8) ="1000" ) then  -- MOV instruction
-		  w_en_sig <= '1';
+		  w_en_sig := '1';
           jump_en <= '0';
           wb_sel <='0';
           ry_im <= '0';
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
           alu_sel <= instruction (11 downto 8);  
-         wr_sig<= instruction(3 downto 0);  -- select Ry as write address
+         wr_sig:= instruction(3 downto 0);  -- select Ry as write address
           imData <=instruction(7 downto 0); 
-          rdy_sig <= instruction(3 downto 0);
-          rdx_sig <= instruction(7 downto 4);
+          rdy_sig := instruction(3 downto 0);
+          rdx_sig := instruction(7 downto 4);
           
         else
-		  w_en_sig <= '1';   
+		  w_en_sig := '1';   
           jump_en <= '0';
           wb_sel <='0';
           ry_im <= '0';
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
           alu_sel <= instruction (11 downto 8);  
-		 wr_sig<= instruction(7 downto 4); -- Rx is write as usual
+		 wr_sig:= instruction(7 downto 4); -- Rx is write as usual
           imData <=instruction(7 downto 0); 
-          rdy_sig <= instruction(3 downto 0);
-          rdx_sig <= instruction(7 downto 4);
+          rdy_sig := instruction(3 downto 0);
+          rdx_sig := instruction(7 downto 4);
           
           
         end if;
@@ -173,60 +178,60 @@ begin
           
           
         when load_indirect =>  -- R[x] <= MEM[Ry]
-		  w_en <= '1';
+		  w_en_sig := '1';
           jump_en <= '0';
           wb_sel <='1';
           ry_im <= '0';
           sel_dmem <= '1';  
           alu_op <= instruction(15 downto 12);
           alu_sel <= instruction (11 downto 8);  
-         wr_sig<= instruction(7 downto 4);   --Rx
+         wr_sig:= instruction(7 downto 4);   --Rx
           imData <=instruction(7 downto 0); 
-          rdx_sig <= instruction(7 downto 4);  -- actually Ry b/c dumb ISA
-          rdy_sig <= instruction(7 downto 4);
+          rdx_sig := instruction(7 downto 4);  -- actually Ry b/c dumb ISA
+          rdy_sig := instruction(7 downto 4);
           
           
         when store_indirect =>
-		  w_en <= '0';
+		  w_en_sig := '0';
           jump_en <= '0';
           wb_sel <='1';
           ry_im <= '0';
           sel_dmem <= '1';
           alu_op <= instruction(15 downto 12);
           alu_sel <= instruction (11 downto 8);  
-         wr_sig<= instruction(7 downto 4);
+         wr_sig:= instruction(7 downto 4);
           imData <=instruction(7 downto 0); 
-          rdx_sig <= instruction(3 downto 0);
-          rdy_sig <= instruction(7 downto 4);
+          rdx_sig := instruction(3 downto 0);
+          rdy_sig := instruction(7 downto 4);
           
         when  load_reg =>
-		  w_en <= '1';
+		  w_en_sig := '1';
           jump_en <= '0';
           wb_sel <='1';
           ry_im <= '0';
           sel_dmem <= '0';  -- selects imData
           alu_op <= instruction(15 downto 12);
           alu_sel <= instruction (11 downto 8);  
-         wr_sig<= instruction(11 downto 8);
+         wr_sig:= instruction(11 downto 8);
           imData <=instruction(7 downto 0); 
-          rdx_sig <= instruction(11 downto 8);
-          rdy_sig <= instruction(7 downto 4);
+          rdx_sig := instruction(11 downto 8);
+          rdy_sig := instruction(7 downto 4);
           
         when store_reg =>
-		  w_en <= '0';
+		  w_en_sig := '0';
           jump_en <= '0';
           wb_sel <='1';
           ry_im <= '0';
           sel_dmem <= '0';  -- select ImData
           alu_op <= instruction(15 downto 12);
           alu_sel <= instruction (11 downto 8);  
-         wr_sig<= instruction(11 downto 8);
+         wr_sig:= instruction(11 downto 8);
           imData <=instruction(7 downto 0); 
-          rdx_sig <= instruction(11 downto 8);
-          rdy_sig <= instruction(11 downto 8);
+          rdx_sig := instruction(11 downto 8);
+          rdy_sig := instruction(11 downto 8);
           
         when jump =>
-		  w_en <= '0';
+		  w_en_sig := '0';
           wb_sel <='0';
           ry_im <= '0';
           sel_dmem <= '0';
@@ -234,23 +239,23 @@ begin
 		  jump_addr <= instruction(7 downto 0);
           alu_op <= instruction(15 downto 12);
           alu_sel <= instruction (11 downto 8);  
-         wr_sig<= instruction(3 downto 0);
+         wr_sig:= instruction(3 downto 0);
           imData <=instruction(7 downto 0); 
-          rdy_sig <= instruction(3 downto 0);
-          rdx_sig <= instruction(7 downto 4);
+          rdy_sig := instruction(3 downto 0);
+          rdx_sig := instruction(7 downto 4);
           
         when branch_zero =>
-		  w_en <= '0';
+		  w_en_sig := '0';
           jump_en <= '0';
           wb_sel <='0';	
           ry_im <= '0';
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
           alu_sel <= instruction (11 downto 8);  
-         wr_sig<= instruction(3 downto 0);
+         wr_sig:= instruction(3 downto 0);
           imData <=instruction(7 downto 0); 
-          rdy_sig <= instruction(3 downto 0);
-          rdx_sig <= instruction(7 downto 4);
+          rdy_sig := instruction(3 downto 0);
+          rdx_sig := instruction(7 downto 4);
 			if (z_flg = '0') then
 				branch_en <= '1';
 				offset <= instruction(7 downto 0);
@@ -258,17 +263,17 @@ begin
           
           
         when branch_notzero =>
-		  w_en <= '0';
+		  w_en_sig := '0';
           jump_en <= '0';
           wb_sel <='0';
           ry_im <= '0';
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
           alu_sel <= instruction (11 downto 8);  
-         wr_sig<= instruction(3 downto 0);
+         wr_sig:= instruction(3 downto 0);
           imData <=instruction(7 downto 0); 
-          rdy_sig <= instruction(3 downto 0);
-          rdx_sig <= instruction(7 downto 4);
+          rdy_sig := instruction(3 downto 0);
+          rdx_sig := instruction(7 downto 4);
 			if (z_flg = '1') then
 				branch_en <= '1';
 				offset <= instruction(7 downto 0);
@@ -279,39 +284,31 @@ begin
           
       when others => null; 
 		-- same output as nop
-		w_en <= '0';
+		w_en_sig := '0';
         jump_en <= '0';
         wb_sel <='0';
         ry_im<='0';
         sel_dmem<='0';
         alu_op <= instruction(15 downto 12);
         alu_sel <= instruction (11 downto 8); 
-       wr_sig<= instruction(3 downto 0);
-        rdy_sig <= instruction(3 downto 0);
-        rdx_sig <= instruction(7 downto 4); 
+        wr_sig:= instruction(3 downto 0);
+        rdy_sig := instruction(3 downto 0);
+        rdx_sig := instruction(7 downto 4); 
         imData <=instruction(7 downto 0);
         
       end case;
-    end process;
+
+	w_en_internal <= w_en_sig;
+	wr_internal <= wr_sig;
+
 -------------- End decode section -----------------
 
 
 
 -------------- begin haz check section ------------
 	
-	-- process which updates haz register each clock cycle regardless of instruction change
-	haz_update : process(clk) is
 
-	variable stall : natural range 0 to 2 := 0; -- stall length for hazard
-
-	begin
-	if (rising_edge(clk)) then  
-		-- move hazards down through register
-		reg(0) <= reg(1);
-		reg(1) <= reg(2);
-		reg(2) <= w_en_sig & wr_sig;  -- 1 in MSB denotes register expects to be written
-				
-			-- get stall length based upon hazard location in pipeline
+	-- get stall length based upon hazard location in pipeline
 		if (stall = 0) then
 			if (reg(1)(4) = '1') then
 				if (rdx_sig = reg(1)(3 downto 0) or (rdy_sig = reg(1)(3 downto 0))) then
@@ -345,11 +342,23 @@ begin
 	        sel_dmem<= '0';
 	        alu_op <= (others => '0');
 	        alu_sel <= (others => '0');
-			wr_sig <= (others => '0');
-	        rdy_sig <= (others => '0');
-	        rdx_sig <= (others => '0');
+			wr_sig := (others => '0');
+	        rdy_sig := (others => '0');
+	        rdx_sig := (others => '0');
 	        imData <= (others => '0');
 		end if;
+
+    end process;
+
+
+	-- process which updates haz register each clock cycle regardless of instruction change
+	haz_update : process(clk) is
+	begin
+	if (rising_edge(clk)) then  
+		-- move hazards down through register
+		reg(0) <= reg(1);
+		reg(1) <= reg(2);
+		reg(2) <= w_en_internal & wr_internal;  -- 1 in MSB denotes register expects to be written
 	end if;
 	end process;
 	    			
