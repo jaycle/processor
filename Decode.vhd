@@ -43,7 +43,7 @@ architecture behav of decode is
 	signal w_en_internal : std_logic;
 	signal wr_internal : std_logic_vector(3 downto 0);
 
-	type data is array(0 to 2) of std_logic_vector(4 downto 0);  -- MSB is hazard, 3 downto 0 is address
+	type data is array(0 to 1) of std_logic_vector(4 downto 0);  -- MSB is hazard, 3 downto 0 is address
         signal reg : data := (others => (others => '0'));  -- holds hazards and address
 
 	signal bz, bnz  : std_logic_vector(7 downto 0);  -- hold bz and bnz offset for a cycle
@@ -142,7 +142,7 @@ begin
           alu_sel <= instruction (11 downto 8);  
          wr_sig:= instruction(7 downto 4);
           imData <=instruction(7 downto 0); 
-          rdy_sig := instruction(3 downto 0);
+          rdy_sig := instruction(7 downto 4);
           rdx_sig := instruction(7 downto 4);
           
         when shift =>
@@ -159,21 +159,6 @@ begin
           rdx_sig := instruction(7 downto 4);
           
         when alu_logic =>
-          
-          if (instruction (11 downto 8) ="1000" ) then  -- MOV instruction
-		  w_en_sig := '1';
-          jump_en <= '0';
-          wb_sel <='0';
-          ry_im <= '0';
-          sel_dmem <= '0';
-          alu_op <= instruction(15 downto 12);
-          alu_sel <= instruction (11 downto 8);  
-         wr_sig:= instruction(3 downto 0);  -- select Ry as write address
-          imData <=instruction(7 downto 0); 
-          rdy_sig := instruction(3 downto 0);
-          rdx_sig := instruction(7 downto 4);
-          
-        else
 		  w_en_sig := '1';   
           jump_en <= '0';
           wb_sel <='0';
@@ -181,12 +166,29 @@ begin
           sel_dmem <= '0';
           alu_op <= instruction(15 downto 12);
           alu_sel <= instruction (11 downto 8);  
-		 wr_sig:= instruction(7 downto 4); -- Rx is write as usual
-          imData <=instruction(7 downto 0); 
-          rdy_sig := instruction(3 downto 0);
-          rdx_sig := instruction(7 downto 4);
+          imData <=instruction(7 downto 0);
+
+          if (instruction (11 downto 8) ="1000" ) then  -- MOV instruction
+	          wr_sig:= instruction(3 downto 0);  -- select Ry as write address
+	          rdy_sig := instruction(3 downto 0);
+	          rdx_sig := instruction(7 downto 4);
           
-          
+        elsif (instruction (11 downto 8) ="0000" ) then -- NOT
+			 wr_sig:= instruction(7 downto 4); -- Rx is write as usual
+	         rdy_sig := instruction(7 downto 4);
+	         rdx_sig := instruction(7 downto 4);
+        elsif (instruction (11 downto 8) ="0110" ) then -- CLR
+			 wr_sig:= instruction(7 downto 4); -- Rx is write as usual
+	         rdy_sig := instruction(7 downto 4);
+	         rdx_sig := instruction(7 downto 4);
+        elsif (instruction (11 downto 8) = "0111" ) then -- SET
+			 wr_sig:= instruction(7 downto 4); -- Rx is write as usual
+	         rdy_sig := instruction(7 downto 4);
+	         rdx_sig := instruction(7 downto 4);
+        else -- defaults
+			 wr_sig:= instruction(7 downto 4); -- Rx is write as usual
+	         rdy_sig := instruction(3 downto 0);
+	         rdx_sig := instruction(7 downto 4);
         end if;
         
        -- when en_interupts =>
@@ -336,11 +338,11 @@ begin
 
 	-- get stall length based upon hazard location in pipeline
 		if (stall = 0) then
+--			if (reg(1)(4) = '1') then
+--				if (rdx_sig = reg(1)(3 downto 0) or (rdy_sig = reg(1)(3 downto 0))) then
+--					stall := 2;
+--				end if;
 			if (reg(1)(4) = '1') then
-				if (rdx_sig = reg(1)(3 downto 0) or (rdy_sig = reg(1)(3 downto 0))) then
-					stall := 2;
-				end if;
-			elsif (reg(0)(4) = '1') then
 				if (rdx_sig = reg(0)(3 downto 0) or (rdy_sig = reg(0)(3 downto 0))) then
 					stall := 1;
 				end if;
@@ -358,7 +360,7 @@ begin
 			rdy <= rdy_sig;
 		else
 			branch_en <= '1';
-			offset <= std_logic_vector(to_signed(-stall, offset'length));
+			offset <= std_logic_vector(to_signed(-1, offset'length));
 			stall := stall - 1;
 				-- zeros down pipeline
 			wr <= (others => '0');
@@ -384,9 +386,9 @@ begin
 	begin
 	if (rising_edge(clk)) then  
 		-- move hazards down through register
+--		reg(0) <= reg(1);
 		reg(0) <= reg(1);
-		reg(1) <= reg(2);
-		reg(2) <= w_en_internal & wr_internal;  -- 1 in MSB denotes register expects to be written
+		reg(1) <= w_en_internal & wr_internal;  -- 1 in MSB denotes register expects to be written
 	end if;
 	end process;
 	    			

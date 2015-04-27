@@ -49,11 +49,11 @@ BEGIN
     -- Manually filled instructions
 --            INST - Rx    - Ry/Im
 	MEM(0) <= NOP;  -- first instruction
-	MEM(1) <= ADDI 	& "0000" & "00001111";
-	MEM(2) <= ADDI 	& "0001" & "00110011";
-	MEM(3) <= ADDI  & "0010" & "10001000";
-	MEM(4) <= ADDI	& "0101" & "10101010";
-	MEM(5) <= ADDI 	& "0110" & "10111011";
+	MEM(1) <= ADDI 	& "0000" & "00001111";  -- R[0] = 0F
+	MEM(2) <= ADDI 	& "0001" & "00110011";  -- R[1] = 33
+	MEM(3) <= ADDI  & "0010" & "10001000";	-- R[2] = 88
+	MEM(4) <= ADDI	& "0101" & "10101010";	-- R[5] = AA
+	MEM(5) <= ADDI 	& "0110" & "10111011";	-- R[6]	= BB
 	MEM(6) <= NOP;
 	MEM(7) <= NOP;
 	MEM(8) <= NOP;
