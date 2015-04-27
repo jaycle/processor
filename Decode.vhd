@@ -44,7 +44,7 @@ architecture behav of decode is
 	signal wr_internal : std_logic_vector(3 downto 0);
 
 	type data is array(0 to 2) of std_logic_vector(4 downto 0);  -- MSB is hazard, 3 downto 0 is address
-    signal reg : data := (others => (others => '0'));  -- holds hazards and address
+        signal reg : data := (others => (others => '0'));  -- holds hazards and address
 
 	signal bz, bnz  : std_logic_vector(7 downto 0);  -- hold bz and bnz offset for a cycle
 	signal bz_wait, bnz_wait : std_logic;
@@ -52,10 +52,10 @@ architecture behav of decode is
 begin
 
   
-	decode : process(instruction)
+	decode : process(instruction, clk)
 	-- variable declarations 
 	variable op : std_logic_vector(3 downto 0);
-    variable sel : std_logic_vector(3 downto 0);
+        variable sel : std_logic_vector(3 downto 0);
 	variable stall : natural range 0 to 2 := 0; -- stall length for hazard
 
 	variable w_en_sig : std_logic;
@@ -71,10 +71,10 @@ begin
 	jump_addr <= "00000000";
 	jump_en <= '0';
 	w_en_sig := '0';
-    wb_sel <='0';
-    ry_im<='0';
-    sel_dmem<='0';
-	clr_1 <= '0';
+        wb_sel <='0';
+        ry_im<='0';
+        sel_dmem<='0';
+        clr_1 <= '0';
 	clr_2 <= '0';        
 	clr_3 <= '0';
 	bz <= 	"00000000";
@@ -119,14 +119,14 @@ begin
           rdy_sig := instruction(7 downto 4); 
           
         when add_sub =>
-		  w_en_sig := '1';
+          w_en_sig := '1';
           jump_en <= '0'; 
           wb_sel <='0';
           ry_im <= '0';
           sel_dmem <= '1';
           alu_op <= instruction(15 downto 12);
           alu_sel <= instruction (11 downto 8);  
-         wr_sig:= instruction(7 downto 4);
+          wr_sig:= instruction(7 downto 4);
           imData <=instruction(7 downto 0); 
           rdy_sig := instruction(3 downto 0);
           rdx_sig := instruction(7 downto 4); 
