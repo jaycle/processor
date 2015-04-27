@@ -313,10 +313,16 @@ begin
 	if ((bnz_wait = '1') and (z_flg = '0')) then
 		branch_en <= '1';
 		offset <= bnz;
+		clr_1 <= '1';
+		clr_2 <= '1';
+		clr_3 <= '1';
 	end if;
 	if ((bz_wait = '1') and (z_flg = '1')) then
 		branch_en <= '1';
 		offset <= bz;
+		clr_1 <= '1';
+		clr_2 <= '1';
+		clr_3 <= '1';
 	end if;
 	w_en_internal <= w_en_sig;
 	wr_internal <= wr_sig;
