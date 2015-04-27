@@ -12,7 +12,10 @@ entity decode is
 		wb_sel, -- selects writeback data. 1 : DMEM, 0 : ALU out
 		jump_en, 
 		w_en,  -- register write enable
-		branch_en : out std_logic
+		branch_en : out std_logic;
+		clr_1,  				-- IF/ID register
+		clr_2,  				-- ID/EX register
+		clr_3 : out std_logic   -- EX/WB register
       );
     end entity;
     
@@ -68,6 +71,9 @@ begin
     wb_sel <='0';
     ry_im<='0';
     sel_dmem<='0';
+	clr_1 <= '0';
+	clr_2 <= '0';        
+	clr_3 <= '0';
 
 	-- variable (re)assignment
 	op := instruction(15 downto 12);
@@ -88,7 +94,9 @@ begin
           rdy_sig := instruction(3 downto 0);
           rdx_sig := instruction(7 downto 4);
         imData <=instruction(7 downto 0);
-        
+		clr_1 <= '0';
+		clr_2 <= '0';        
+		clr_3 <= '0';
       
 	when add_im =>
 		  w_en_sig := '1';
@@ -243,6 +251,7 @@ begin
           imData <=instruction(7 downto 0); 
           rdy_sig := instruction(3 downto 0);
           rdx_sig := instruction(7 downto 4);
+		  clr_1 <= '1';   -- clear previous instruction
           
         when branch_zero =>
 		  w_en_sig := '0';
@@ -346,6 +355,8 @@ begin
 	        rdy_sig := (others => '0');
 	        rdx_sig := (others => '0');
 	        imData <= (others => '0');
+			   -- clear previous instruction too
+			clr_1 <= '1';
 		end if;
 
     end process;
