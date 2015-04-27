@@ -14,7 +14,7 @@ architecture Arch of Pipelined is
 signal instr_to_reg, instr_to_dec : std_logic_vector(15 downto 0);
 signal offsets,jump_address, imdata_to_reg, imdata_to_exec, dmem_to_reg, dmem_to_wr, alu_to_reg, alu_to_wr, wb_sig : std_logic_vector(7 downto 0);
 signal RX_to_reg, RX_to_exec,RY_to_reg, RY_to_exec, wr_to_reg, wr_to_exec,OP_to_reg, OP_to_exec, Sel_to_reg, Sel_to_exec : std_logic_vector(3 downto 0);
-signal branch_ens, jump_ens,Z_flags, ryim_to_reg, ryim_to_exec, dmemsel_to_reg, dmemsel_to_exec, wren_to_reg, wren_to_exec, wbsel_to_reg, wbsel_to_exec, wbsel_to_wr : std_logic; 
+signal clr1f, clr2d, clr3e, branch_ens, jump_ens,Z_flags, ryim_to_reg, ryim_to_exec, dmemsel_to_reg, dmemsel_to_exec, wren_to_reg, wren_to_exec, wbsel_to_reg, wbsel_to_exec, wbsel_to_wr : std_logic; 
 
 begin
 
@@ -30,6 +30,7 @@ fetch : entity work.fetch(Behav)
 
 fetch_decode : entity work.fetch_decode(arch)
   Port Map(   
+	  clr => clr1f,
           Clk => clk, 
           instr => instr_to_reg,
 	  instruction => instr_to_dec 
@@ -53,12 +54,16 @@ decoder : entity work.decode(Behav)
 	  wb_sel => wbsel_to_reg,
 	  jump_en => jump_ens,
 	  branch_en => branch_ens,
-	  w_en => wren_to_reg 
+	  w_en => wren_to_reg,
+	  clr_1 => clr1f,
+	  clr_2 => clr2d,
+	  clr_3 => clr3e
           );
 
 
 decode_execute : entity work.decode_execute(arch)
   Port Map(   
+	  clr => clr2d,
           clk => clk,
           rdx_in => RX_to_reg,
 	  rdy_in => RY_to_reg, 
@@ -102,6 +107,7 @@ execute : entity work.Execute(arch)
 
 execute_writeback : entity work.Execute_writeback(arch)
   Port Map(
+	  clr => clr3e,
 	  clk => clk,
    	  wb_sel => wbsel_to_exec,
   	  dmem_out => dmem_to_reg,
