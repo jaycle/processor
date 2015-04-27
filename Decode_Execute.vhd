@@ -3,6 +3,7 @@ USE ieee.std_logic_1164.ALL;
 
 ENTITY Decode_Execute IS
   PORT (
+	clr : in std_logic;
    	clk: in std_logic;
 	rdx_in,rdy_in,wr_in,alu_op_in,alu_sel_in : in std_logic_vector (3 downto 0);
         imData_in: in std_logic_vector (7 downto 0);
@@ -18,9 +19,21 @@ signal w_en_inter : std_logic;
 signal wr_inter : std_logic_vector(3 downto 0);
 
 BEGIN
+
   single : PROCESS(Clk)
   BEGIN
-    IF rising_edge(clk) THEN
+    	if clr = '1' then
+ 	  rdx <= (others => '0'); 
+	  rdy <= (others => '0'); 
+	  wr_inter <= (others => '0'); 
+	  alu_op <= (others => '0'); 
+	  alu_sel <= (others => '0'); 
+	  imdata <= (others => '0'); 
+	  ry_im <= '0'; 
+	  sel_dmem <= '0'; 
+	  wb_sel <= '0'; 
+	  w_en_inter <= '0'; 
+        elsIF rising_edge(clk) THEN
 	  rdx <= rdx_in; 
 	  rdy <= rdy_in; 
 	  wr_inter <= wr_in; 
