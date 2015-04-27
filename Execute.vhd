@@ -103,7 +103,7 @@ MUX_RB_to_ALU : Mux
             Muxout=> Ry_Alu
           );
           
-Mux_Dec_to_ALU: Mux
+Mux_Dec_to_dmem: Mux
   port map(
             SelectL => sel_dmem, --Selector
             Min1=> IM_data, --select if low
