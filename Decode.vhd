@@ -45,6 +45,9 @@ architecture behav of decode is
 
 	type data is array(0 to 2) of std_logic_vector(4 downto 0);  -- MSB is hazard, 3 downto 0 is address
     signal reg : data := (others => (others => '0'));  -- holds hazards and address
+
+	signal bz, bnz  : std_logic_vector(7 downto 0);  -- hold bz and bnz offset for a cycle
+	signal bz_wait, bnz_wait : std_logic;
   
 begin
 
@@ -74,6 +77,10 @@ begin
 	clr_1 <= '0';
 	clr_2 <= '0';        
 	clr_3 <= '0';
+	bz <= 	"00000000";
+	bnz <= 	"00000000";
+	bz_wait <= '0';
+	bnz_wait <= '0';
 
 	-- variable (re)assignment
 	op := instruction(15 downto 12);
@@ -265,12 +272,10 @@ begin
           imData <=instruction(7 downto 0); 
           rdy_sig := instruction(3 downto 0);
           rdx_sig := instruction(7 downto 4);
-			if (z_flg = '0') then
-				branch_en <= '1';
-				offset <= instruction(7 downto 0);
-			end if;
-          
-          
+		  bz <= instruction(7 downto 0);
+		  bz_wait <= '1';
+
+         
         when branch_notzero =>
 		  w_en_sig := '0';
           jump_en <= '0';
@@ -283,12 +288,9 @@ begin
           imData <=instruction(7 downto 0); 
           rdy_sig := instruction(3 downto 0);
           rdx_sig := instruction(7 downto 4);
-			if (z_flg = '1') then
-				branch_en <= '1';
-				offset <= instruction(7 downto 0);
-			end if;
-          
-          
+		  bnz <= instruction(7 downto 0);
+      	  bnz_wait <= '1';
+        
         --when  return_interupt
           
       when others => null; 
@@ -307,6 +309,15 @@ begin
         
       end case;
 
+	  -- handle z_flg dependent behavior
+	if ((bnz_wait = '1') and (z_flg = '0')) then
+		branch_en <= '1';
+		offset <= bnz;
+	end if;
+	if ((bz_wait = '1') and (z_flg = '1')) then
+		branch_en <= '1';
+		offset <= bz;
+	end if;
 	w_en_internal <= w_en_sig;
 	wr_internal <= wr_sig;
 
@@ -373,6 +384,5 @@ begin
 	end if;
 	end process;
 	    			
-  
 
 end behav;
