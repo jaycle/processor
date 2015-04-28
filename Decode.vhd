@@ -261,7 +261,7 @@ begin
 		  jump_addr <= instruction(7 downto 0);
           alu_op <= instruction(15 downto 12);
           alu_sel <= instruction (11 downto 8);  
-         wr_sig:= instruction(3 downto 0);
+          wr_sig:= instruction(3 downto 0);
           imData <=instruction(7 downto 0); 
           rdy_sig := instruction(3 downto 0);
           rdx_sig := instruction(7 downto 4);
@@ -368,7 +368,7 @@ begin
 			rdy <= rdy_sig;
 		else
 			branch_en <= '1';
-			offset <= std_logic_vector(to_signed(-1, offset'length));
+			offset <= std_logic_vector(to_signed(-2, offset'length));
 			stall := 0;
 				-- zeros down pipeline
 			wr <= (others => '0');

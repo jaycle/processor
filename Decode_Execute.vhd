@@ -22,29 +22,31 @@ BEGIN
 
   single : PROCESS(Clk)
   BEGIN
+     IF rising_edge(clk) THEN
     	if clr = '1' then
- 	  rdx <= (others => '0'); 
-	  rdy <= (others => '0'); 
-	  wr_inter <= (others => '0'); 
-	  alu_op <= (others => '0'); 
-	  alu_sel <= (others => '0'); 
-	  imdata <= (others => '0'); 
-	  ry_im <= '0'; 
-	  sel_dmem <= '0'; 
-	  wb_sel <= '0'; 
-	  w_en_inter <= '0'; 
-        elsIF rising_edge(clk) THEN
-	  rdx <= rdx_in; 
-	  rdy <= rdy_in; 
-	  wr_inter <= wr_in; 
-	  alu_op <= alu_op_in; 
-	  alu_sel <= alu_sel_in; 
-	  imdata <= imdata_in; 
-	  ry_im <= ry_im_in; 
-	  sel_dmem <= sel_dmem_in; 
-	  wb_sel <= wb_sel_in; 
-	  w_en_inter <= w_en_in; 
-    END IF;
+	 	  rdx <= (others => '0'); 
+		  rdy <= (others => '0'); 
+		  wr_inter <= (others => '0'); 
+		  alu_op <= (others => '0'); 
+		  alu_sel <= (others => '0'); 
+		  imdata <= (others => '0'); 
+		  ry_im <= '0'; 
+		  sel_dmem <= '0'; 
+		  wb_sel <= '0'; 
+		  w_en_inter <= '0'; 
+	  else
+		  rdx <= rdx_in; 
+		  rdy <= rdy_in; 
+		  wr_inter <= wr_in; 
+		  alu_op <= alu_op_in; 
+		  alu_sel <= alu_sel_in; 
+		  imdata <= imdata_in; 
+		  ry_im <= ry_im_in; 
+		  sel_dmem <= sel_dmem_in; 
+		  wb_sel <= wb_sel_in; 
+		  w_en_inter <= w_en_in; 
+	   end if;
+	  END IF;
   END PROCESS;
 
   double : process (clk)

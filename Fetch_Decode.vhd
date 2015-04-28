@@ -15,10 +15,12 @@ BEGIN
 
   PROCESS(Clk, clr)
   BEGIN
-	if clr = '1' then
+    IF rising_edge(clk) THEN
+      if clr = '1' then
 		instruction <= "0000000000000000";
-        elsIF rising_edge(clk) THEN
+	  else
 	  	instruction <= instr;
+	  end if;
 	end if;
   END PROCESS;
 END ARCHITECTURE;
