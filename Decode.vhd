@@ -42,6 +42,7 @@ architecture behav of decode is
  
 	signal w_en_internal : std_logic;
 	signal wr_internal : std_logic_vector(3 downto 0);
+	signal hazclr : std_logic;
 
 	type data is array(0 to 1) of std_logic_vector(4 downto 0);  -- MSB is hazard, 3 downto 0 is address
         signal reg : data := (others => (others => '0'));  -- holds hazards and address
@@ -65,7 +66,11 @@ begin
 
 	begin
 
+
+
+
 	-- default outputs
+	hazclr <= '0';
 	branch_en <= '0';
 	offset <= "00000000";
 	jump_addr <= "00000000";
@@ -260,7 +265,7 @@ begin
           imData <=instruction(7 downto 0); 
           rdy_sig := instruction(3 downto 0);
           rdx_sig := instruction(7 downto 4);
-		  clr_1 <= '1';   -- clear previous instruction
+		  clr_1 <= '1';   -- clear next instruction
           
         when branch_zero =>
 		  w_en_sig := '0';
@@ -295,7 +300,7 @@ begin
         
         --when  return_interupt
           
-      when others => null; 
+      when others =>  
 		-- same output as nop
 		w_en_sig := '0';
         jump_en <= '0';
@@ -315,9 +320,11 @@ begin
 	if ((bnz_wait = '1') and (z_flg = '0')) then
 		branch_en <= '1';
 		offset <= bnz;
+		-- clear pipeline and history of writes		
 		clr_1 <= '1';
 		clr_2 <= '1';
 		clr_3 <= '1';
+		hazclr <= '1';
 	end if;
 	if ((bz_wait = '1') and (z_flg = '1')) then
 		branch_en <= '1';
@@ -325,6 +332,7 @@ begin
 		clr_1 <= '1';
 		clr_2 <= '1';
 		clr_3 <= '1';
+		hazclr <= '1';
 	end if;
 	w_en_internal <= w_en_sig;
 	wr_internal <= wr_sig;
@@ -361,7 +369,7 @@ begin
 		else
 			branch_en <= '1';
 			offset <= std_logic_vector(to_signed(-1, offset'length));
-			stall := stall - 1;
+			stall := 0;
 				-- zeros down pipeline
 			wr <= (others => '0');
 			w_en <= '0';
@@ -374,22 +382,29 @@ begin
 	        rdy_sig := (others => '0');
 	        rdx_sig := (others => '0');
 	        imData <= (others => '0');
-			   -- clear previous instruction too
+			   -- clear previous instruction and write registers
 			clr_1 <= '1';
+			hazclr <= '1';
+
 		end if;
 
     end process;
 
 
 	-- process which updates haz register each clock cycle regardless of instruction change
-	haz_update : process(clk) is
+	haz_update : process(clk, hazclr) is
 	begin
 	if (rising_edge(clk)) then  
 		-- move hazards down through register
 --		reg(0) <= reg(1);
-		reg(0) <= reg(1);
-		reg(1) <= w_en_internal & wr_internal;  -- 1 in MSB denotes register expects to be written
-	end if;
+		if hazclr = '1' then
+			reg(0)(4) <= '0';
+			reg(1)(4) <= '0';
+		else
+			reg(0) <= reg(1);
+			reg(1) <= w_en_internal & wr_internal;  -- 1 in MSB denotes register expects to be written
+		end if; -- hazclr
+	end if;	-- clk
 	end process;
 	    			
 
